@@ -1,0 +1,25 @@
+# Python & Virtual Env
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Datasets & Heavy Weights (auto-downloaded)
+data/raw/
+data/datasets/
+*.pt
+*.onnx
+*.pth
+runs/
+
+# Environment & Secrets
+.env
+*.env
+
+# Testing & IDE
+.pytest_cache/
+.coverage
+.vscode/
+.idea/
