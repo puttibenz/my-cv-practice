@@ -5,15 +5,16 @@
 
 ## โครงสร้างหลักสูตร 5 Modules + 1 Production Capstone
 
-### [ ] Module 1: Pixel Math, Color Spaces & 2D Convolution from Scratch (Pure NumPy)
+### [x] Module 1: Pixel Math, Color Spaces & 2D Convolution from Scratch (Pure NumPy) ✅
 * **แนวคิดหลัก:**
   - โครงสร้างภาพดิจิทัล: มิติของภาพ `(H, W, C)`, ชนิดข้อมูล `uint8` (0–255) vs `float32` (0.0–1.0)
-  - การแปลง RGB เป็น Grayscale ด้วยสมการความสว่างของตาekมนุษย์ (Luminance Equation: $0.299R + 0.587G + 0.114B$)
+  - การแปลง RGB เป็น Grayscale ด้วยสมการความสว่างของดวงตามนุษย์ (Luminance Equation: $0.299R + 0.587G + 0.114B$)
   - การปรับความสว่าง/คอนทราสต์ และการทำ **Min-Max / Clipping** ป้องกันปัญหา Integer Overflow
   - การเขียน **2D Spatial Convolution (`conv2d_numpy`)** จากศูนย์ด้วย NumPy (Sliding Window + Zero Padding)
   - การสกัดขอบภาพด้วย **Sobel Edge Detector** ($G_x, G_y, G = \sqrt{G_x^2 + G_y^2}$)
   - การลดขนาดภาพด้วย **2D Max Pooling (`maxpool2d_numpy`)** ซึ่งเป็นหัวใจของ CNN
 * **ไฟล์ฝึกหัด:** [`practice/module_01_pixel_math_numpy.py`](./practice/module_01_pixel_math_numpy.py)
+* **สถานะ:** ผ่านการทดสอบครบ 4/4 ข้อสมบูรณ์ 100% (Pass All Asserts)
 
 ---
 

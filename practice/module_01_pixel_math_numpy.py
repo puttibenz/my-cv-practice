@@ -85,8 +85,9 @@ def rgb_to_grayscale(img_rgb: np.ndarray) -> np.ndarray:
       - อย่าลืมแปลงผลลัพธ์เป็น .astype(np.float32)
     """
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    dot_product = img_rgb @ np.array([0.299, 0.587, 0.114])
 
+    return dot_product.astype(np.float32)
 
 # --- ทดสอบโจทย์ข้อที่ 1 ---
 test_img = create_synthetic_test_image(64)
@@ -101,7 +102,7 @@ blue_lum = gray_img[45, 32]   # 0.114 * 250 = 28.50
 assert np.isclose(green_lum, 0.587 * 240, atol=1e-2), f"ค่าความสว่างสีเขียวไม่ตรง: {green_lum}"
 assert np.isclose(blue_lum, 0.114 * 250, atol=1e-2), f"ค่าความสว่างสีน้ำเงินไม่ตรง: {blue_lum}"
 print("✅ ข้อที่ 1 ผ่าน! (สีเขียวสว่างกว่าสีน้ำเงินตามหลักสรีรวิทยาของดวงตามนุษย์)")
-# plot_before_after(test_img, "Original RGB", gray_img, "Grayscale (Luminance)")
+plot_before_after(test_img, "Original RGB", gray_img, "Grayscale (Luminance)")
 
 
 # %% [markdown]
@@ -126,7 +127,13 @@ def adjust_brightness_contrast(
 ) -> np.ndarray:
     """ปรับความสว่างและคอนทราสต์ของภาพพร้อมป้องกันปัญหา uint8 overflow"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    img_float = img.astype(np.float32)
+
+    adjusted = alpha * img_float + beta
+
+    out = np.clip(adjusted, 0, 255)
+
+    return out.astype(np.uint8)
 
 
 # --- ทดสอบโจทย์ข้อที่ 2 ---
@@ -168,7 +175,21 @@ def conv2d_numpy(image: np.ndarray, kernel: np.ndarray) -> np.ndarray:
         output: 2D array ขนาด (H, W) ชนิด np.float32
     """
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    h, w = image.shape
+
+    kh, kw = kernel.shape
+    pad_h = kh // 2
+    pad_w = kw // 2
+
+    padded = np.pad(image, ((pad_h, pad_h), (pad_w, pad_w)), mode="constant")
+
+    output = np.zeros((h, w), dtype=np.float32)
+    for i in range(h):
+        for j in range(w):
+            patch = padded[i : i + kh, j : j + kw]
+            output[i, j] = np.sum(patch * kernel)
+
+    return output 
 
 
 # --- ทดสอบโจทย์ข้อที่ 3 (Box Blur & Sobel Edge Detection) ---
@@ -217,7 +238,20 @@ def maxpool2d_numpy(feature_map: np.ndarray, pool_size: int = 2) -> np.ndarray:
         pooled: 2D array ขนาด (H // pool_size, W // pool_size) ชนิด np.float32
     """
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    H, W = feature_map.shape
+    h, w = H // pool_size, W // pool_size
+
+    pooled = np.zeros((h, w), dtype=np.float32)
+
+    for i in range(h):
+        for j in range(w):
+            patch = feature_map[i * pool_size : (i + 1) * pool_size, j * pool_size : (j + 1) * pool_size]
+            pooled[i, j] = np.max(patch)
+
+    return pooled
+
+
+    
 
 
 # --- ทดสอบโจทย์ข้อที่ 4 ---
@@ -240,3 +274,5 @@ assert np.array_equal(maxpool2d_numpy(sample_4x4, pool_size=2), expected_2x2), "
 print("✅ ข้อที่ 4 ผ่าน! (สร้าง 2D Max Pooling สำเร็จ)")
 print("\n🎉 ยินดีด้วย! คุณผ่านการทดสอบคณิตศาสตร์ระดับพิกเซลใน Module 1 ครบทุกข้อแล้ว!")
 # plot_before_after(edge_magnitude, "Original Edges (64x64)", pooled_edges, "2x2 Max Pooled Edges (32x32)")
+
+# %%
