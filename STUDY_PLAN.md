@@ -29,13 +29,14 @@
 
 ---
 
-### [ ] Module 3: Deep Learning for Vision & CNN from Scratch on GPU (PyTorch)
+### [x] Module 3: Deep Learning for Vision & CNN from Scratch on GPU (PyTorch) ✅
 * **แนวคิดหลัก:**
   - ความแตกต่างของแกนข้อมูล: OpenCV/NumPy `(H, W, C)` vs PyTorch Tensor `(B, C, H, W)`
   - การสร้าง Data Augmentation Pipeline (`torchvision.transforms.v2`) และ `DataLoader` (ใช้ชุดข้อมูล `FashionMNIST` / `CIFAR-10` ที่ดาวน์โหลดอัตโนมัติในโค้ด)
   - การประกอบร่าง **Convolutional Neural Network (CNN)** (`nn.Conv2d`, `nn.BatchNorm2d`, `nn.ReLU`, `nn.MaxPool2d`, `nn.Linear`)
   - การคำนวณมิติของ Feature Map และการรัน Training / Validation Loop บน **CUDA GPU (RTX 3060)**
 * **ไฟล์ฝึกหัด:** [`practice/module_03_pytorch_cnn_gpu.py`](./practice/module_03_pytorch_cnn_gpu.py)
+* **สถานะ:** ผ่านการทดสอบครบ 4/4 ข้อสมบูรณ์ 100% (Loss: 0.3944, Accuracy: 85.89% บน GPU RTX 3060)
 
 ---
 

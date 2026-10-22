@@ -54,7 +54,16 @@ if device.type == "cuda":
 def numpy_to_torch_batch(img_numpy: np.ndarray, target_device: torch.device) -> torch.Tensor:
     """แปลงภาพ NumPy (H, W, C) เป็น PyTorch Batch Tensor (1, C, H, W) บน Device ที่กำหนด"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    img_float = img_numpy.astype(np.float32) / 255.0
+
+    img_tensor = torch.from_numpy(img_float)
+
+    tensor_chw = img_tensor.permute(2, 0, 1)
+
+    batch_tensor = tensor_chw.unsqueeze(0)
+
+
+    return batch_tensor.to(target_device)
 
 
 # --- ทดสอบโจทย์ข้อที่ 1 ---
@@ -96,11 +105,32 @@ class SimpleCNN(nn.Module):
     def __init__(self, num_classes: int = 10):
         super().__init__()
         # TODO: กำหนดเลเยอร์ต่างๆ ภายใน __init__
-        pass
+        self.features = nn.Sequential(
+            # Block 1
+            nn.Conv2d(1, 16, kernel_size=3, padding=1),
+            nn.BatchNorm2d(16),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+
+            # Block 2
+            nn.Conv2d(16, 32, kernel_size=3, padding=1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+        )
+
+        self.clf = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(32 * 7 * 7, 64),
+            nn.ReLU(),
+            nn.Linear(64, num_classes)
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # TODO: ส่งผ่านข้อมูล x ตามลำดับบล็อกใน forward
-        pass
+        x = self.features(x)
+        x = self.clf(x)
+
+        return x
 
 
 # --- ทดสอบโจทย์ข้อที่ 2 ---
@@ -132,8 +162,25 @@ print("✅ ข้อที่ 2 ผ่าน! (โครงสร้าง CNN �
 def get_fashion_mnist_loaders(batch_size: int = 64) -> tuple[DataLoader, DataLoader]:
     """ดาวน์โหลดและสร้าง DataLoader สำหรับชุดข้อมูล FashionMNIST อัตโนมัติ"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    transform = transforms.Compose([transforms.ToTensor()])
 
+    # 1. ชุดสำหรับฝึกสอน (train=True)
+    train_dataset = torchvision.datasets.FashionMNIST(
+        root="./data", train=True, download=True, transform=transform
+    )
+
+    # 2. ชุดสำหรับทดสอบวัดผล (train=False)
+    test_dataset = torchvision.datasets.FashionMNIST(
+        root="./data", train=False, download=True, transform=transform
+    )
+
+    # Train Loader: ใส่ shuffle=True เพื่อสลับภาพแบบสุ่ม โมเดลจะได้ไม่จำลำดับ
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+
+    # Test Loader: ใส่ shuffle=False เพราะตอนสอบวัดผลไม่จำเป็นต้องสลับ
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+
+    return train_loader, test_loader
 
 # --- ทดสอบโจทย์ข้อที่ 3 ---
 train_loader, test_loader = get_fashion_mnist_loaders(batch_size=64)
@@ -174,7 +221,29 @@ def train_one_epoch(
 ) -> tuple[float, float]:
     """รัน Training Loop 1 Epoch และคืนค่า (Average Loss, Accuracy)"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    
+    model.train()
+    total_loss = 0.0
+    correct = 0
+    total = 0
+    for images, labels, in loader:
+        images, labels = images.to(device), labels.to(device)
+        optimizer.zero_grad()
+
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item()
+        preds = outputs.argmax(dim=1)
+        correct += (preds == labels).sum().item()
+        total += labels.size(0)
+
+    avg_loss = total_loss / len(loader)
+    accuracy = correct / total
+
+    return (avg_loss, accuracy)
 
 
 # --- ทดสอบโจทย์ข้อที่ 4 (รันเทรนจริงบน RTX 3060) ---
@@ -190,3 +259,5 @@ assert acc >= 0.70, f"โมเดล CNN ควรได้ Accuracy ใน Epo
 
 print(f"✅ ข้อที่ 4 ผ่าน! [Epoch 1] Loss: {avg_loss:.4f} | Accuracy: {acc*100:.2f}%")
 print("\n🎉 สุดยอดมาก! คุณฝึกสอนโมเดล CNN บนการ์ดจอ RTX 3060 สำเร็จเรียบร้อยแล้ว!")
+
+# %%
