@@ -74,7 +74,8 @@ def plot_cv_steps(images: list[np.ndarray], titles: list[str]) -> None:
 def fix_bgr_to_rgb(img_bgr: np.ndarray) -> np.ndarray:
     """แปลงภาพจากระบบสี BGR เป็น RGB ด้วย cv2.cvtColor"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+    return img_rgb
 
 
 # --- ทดสอบโจทย์ข้อที่ 1 ---
@@ -111,8 +112,14 @@ print("✅ ข้อที่ 1 ผ่าน! (เข้าใจความต
 def denoise_and_clean(img_gray: np.ndarray) -> np.ndarray:
     """ทำความสะอาดภาพด้วย Gaussian Blur + Otsu Thresholding + Morphological Opening"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    blurred = cv2.GaussianBlur(img_gray, ksize=(5, 5), sigmaX=0)
 
+    _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    clean_mask = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel)
+
+    return clean_mask
 
 # --- ทดสอบโจทย์ข้อที่ 2 ---
 test_canvas = create_shapes_test_image(256)
@@ -150,8 +157,23 @@ print("✅ ข้อที่ 2 ผ่าน! (ทำความสะอาด
 def detect_objects(binary_mask: np.ndarray, min_area: float = 500.0) -> list[dict]:
     """ค้นหาวัตถุในภาพ กรองด้วยขนาดพื้นที่ และคืนค่าพิกัด Bounding Box"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+    coor = []
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+
+        if area >= min_area:
+            x, y, w, h = cv2.boundingRect(cnt)
+            coor.append({
+                "x": int(x),
+                "y": int(y),
+                "w": int(w),
+                "h": int(h),
+                "area": area
+            })
+
+    return coor
 
 # --- ทดสอบโจทย์ข้อที่ 3 ---
 detected_items = detect_objects(clean_mask, min_area=500.0)
@@ -185,8 +207,16 @@ print(f"✅ ข้อที่ 3 ผ่าน! (ตรวจพบวัตถ�
 def draw_detections(img_rgb: np.ndarray, objects: list[dict]) -> np.ndarray:
     """วาดกรอบสี่เหลี่ยมและป้ายกำกับลงบนภาพสำหรับโชว์ผลลัพธ์ Object Detection"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    annotated = img_rgb.copy()
 
+    for o in objects:
+        x, y, w, h = o["x"], o["y"], o["w"], o["h"]
+
+        cv2.rectangle(annotated, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        label = f"Area: {int(o['area'])}"
+        cv2.putText(annotated, label, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 0), 1)
+
+    return annotated
 
 # --- ทดสอบโจทย์ข้อที่ 4 ---
 annotated_result = draw_detections(test_canvas, detected_items)
@@ -197,4 +227,6 @@ assert np.any((annotated_result[:, :, 1] == 255) & (annotated_result[:, :, 0] ==
 
 print("✅ ข้อที่ 4 ผ่าน! (สร้าง Pipeline การตีกรอบและป้ายกำกับวัตถุสำเร็จ)")
 print("\n🎉 ยอดเยี่ยมมาก! คุณสร้าง Classical Object Detection Pipeline ด้วย OpenCV สำเร็จครบทั้ง 4 ขั้นตอนแล้ว!")
-# plot_cv_steps([test_canvas, clean_mask, annotated_result], ["Original Image", "Binary Mask", "Detected Objects"])
+plot_cv_steps([test_canvas, clean_mask, annotated_result], ["Original Image", "Binary Mask", "Detected Objects"])
+
+# %%

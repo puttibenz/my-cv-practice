@@ -18,13 +18,14 @@
 
 ---
 
-### [ ] Module 2: Classical Image Processing & Document/Object Geometry (OpenCV)
+### [x] Module 2: Classical Image Processing & Document/Object Geometry (OpenCV) ✅
 * **แนวคิดหลัก:**
   - ข้อควรระวังอันดับ 1 ของ OpenCV: ระบบสี **`BGR` vs `RGB`**
   - Image Filtering & Denoising: Gaussian Blur, Median Blur, Bilateral Filter
   - Thresholding (Global vs Otsu's vs Adaptive) & Morphological Operations (Erosion, Dilation, Opening, Closing)
   - Canny Edge Detection & Contour Analysis: การหาวัตถุ นับจำนวน วัดพื้นที่ (`cv2.contourArea`) และตีกรอบ Bounding Box รอบวัตถุอัตโนมัติ
 * **ไฟล์ฝึกหัด:** [`practice/module_02_classical_opencv.py`](./practice/module_02_classical_opencv.py)
+* **สถานะ:** ผ่านการทดสอบครบ 4/4 ข้อสมบูรณ์ 100% (Pass All Asserts)
 
 ---
 
