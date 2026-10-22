@@ -7,8 +7,11 @@ __pycache__/
 *.pyd
 
 # Datasets & Heavy Weights (auto-downloaded)
-data/raw/
-data/datasets/
+data/
+practice/data/
+*.jpg
+*.jpeg
+*.png
 *.pt
 *.onnx
 *.pth

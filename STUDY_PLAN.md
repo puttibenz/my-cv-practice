@@ -50,12 +50,15 @@
 
 ---
 
-### [ ] Module 5: Instance Segmentation, Object Cropping & Visual Analytics Pipeline
+### [x] Module 5: Instance Segmentation, Object Cropping & Visual Analytics Pipeline ✅
 * **แนวคิดหลัก:**
   - ความแตกต่างระหว่าง Bounding Box Detection vs Pixel-level Segmentation Mask
-  - การทำ Region of Interest (ROI) Cropping: ตัดภาพเฉพาะวัตถุที่ตรวจจับได้ออกมาวิเคราะห์ต่อ (เช่น นับจำนวนแยกตามโซน หรือวัดสัดส่วนพื้นที่วัตถุ)
-  - การวาด Overlay Annotations, กรอบสี, ป้ายกำกับ และสรุปผลเป็น Structured JSON
+  - การทำ Region of Interest (ROI) Cropping: ตัดภาพเฉพาะวัตถุที่ตรวจจับได้ออกมาวิเคราะห์ต่อ พร้อม Safe Boundary Clipping ป้องกัน Index Error
+  - การทำ Alpha Blending ไฮไลต์วัตถุโปร่งแสงด้วย `cv2.addWeighted`
+  - การวิเคราะห์เชิงพื้นที่ (Spatial Zone Analytics) โดยการตรวจสอบ Center Point เทียบกับพิกัดโซน
+  - การประกอบ Structured Analytics JSON Payload สำหรับส่งออกไปยังระบบ REST API ระดับ Production
 * **ไฟล์ฝึกหัด:** [`practice/module_05_segmentation_and_analytics.py`](./practice/module_05_segmentation_and_analytics.py)
+* **สถานะ:** ผ่านการทดสอบครบ 4/4 ข้อสมบูรณ์ 100% (Pass Safe Cropping, Alpha Overlay, Spatial Zone Analytics & Production Report)
 
 ---
 

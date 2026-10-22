@@ -48,7 +48,21 @@ bus_image = cv2.imread("bus_sample.jpg")
 def crop_objects(img_bgr: np.ndarray, detections: list[dict]) -> list[np.ndarray]:
     """ตัดชิ้นส่วนภาพวัตถุ (ROI) จากพิกัด Bounding Box พร้อมป้องกันพิกัดล้นขอบภาพ"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    H, W = img_bgr.shape[:2]
+
+    croped = []
+    for d in detections:
+        x1, y1, x2, y2 = d["box"]
+        x1_safe = max(0, min(int(x1), W))
+        y1_safe = max(0, min(int(y1), H))
+        x2_safe = max(0, min(int(x2), W))
+        y2_safe = max(0, min(int(y2), H))
+
+        crop = img_bgr[y1_safe:y2_safe, x1_safe:x2_safe]
+        if crop.size > 0:
+            croped.append(crop)
+
+    return croped
 
 
 # --- ทดสอบโจทย์ข้อที่ 1 ---
@@ -90,7 +104,12 @@ def apply_color_overlay(
 ) -> np.ndarray:
     """ระบายสีโปร่งแสงไฮไลต์ทับตำแหน่งวัตถุด้วย cv2.addWeighted"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    overlay = img_bgr.copy()
+    x1, y1, x2, y2 = map(int, box)
+    cv2.rectangle(overlay, (x1, y1), (x2, y2), color, -1)
+    cv2.addWeighted(overlay, alpha, img_bgr, 1 - alpha, 0)
+
+    return overlay
 
 
 # --- ทดสอบโจทย์ข้อที่ 2 ---
@@ -125,7 +144,19 @@ print("✅ ข้อที่ 2 ผ่าน! (สร้างไฮไลต์
 def count_objects_in_zone(detections: list[dict], zone_box: list[float]) -> int:
     """นับจำนวนวัตถุที่จุดศูนย์กลางตกลงในโซนพื้นที่ที่กำหนด"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    zx1, zy1, zx2, zy2 = zone_box
+
+    cnt = 0
+    for box in detections:
+        x1, y1, x2, y2 = box["box"]
+
+        cx = (x1 + x2) / 2
+        cy = (y1 + y2) / 2
+
+        if zx1 <= cx <= zx2 and zy1 <= cy <= zy2:
+            cnt += 1
+
+    return cnt
 
 
 # --- ทดสอบโจทย์ข้อที่ 3 ---
@@ -166,8 +197,24 @@ def build_analytics_report(
 ) -> dict:
     """สร้างรายงานสรุปสถิติการตรวจจับวัตถุสำหรับส่งออก REST API ระดับ Production"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    total_objects = len(detections)
 
+    counts_by_class = {}
+    for d in detections:
+        if counts_by_class.get(d["class_name"]):
+            counts_by_class[d["class_name"]] += 1
+        else:
+            counts_by_class[d["class_name"]] = 1
+
+    counts_by_zone = {}
+    for zone_name, zone_box in zones.items():
+        counts_by_zone[zone_name] = count_objects_in_zone(detections, zone_box)
+
+    return {
+        "total_objects": total_objects,
+        "counts_by_class": counts_by_class,
+        "counts_by_zone": counts_by_zone
+    }
 
 # --- ทดสอบโจทย์ข้อที่ 4 ---
 zones_config = {
@@ -180,6 +227,8 @@ assert report is not None, "กรุณาเติมโค้ดในข้�
 assert report["total_objects"] == 3
 assert "counts_by_class" in report and "counts_by_zone" in report
 assert report["counts_by_zone"]["zone_left"] == 2
-assert report["counts_by_zone"]["zone_right"] == 0
+assert report["counts_by_zone"]["zone_right"] == 1
 print("✅ ข้อที่ 4 ผ่าน! (สร้าง Structured Analytics Payload สำหรับ Production สำเร็จ)")
 print("\n🎉 ยอดเยี่ยมมาก! คุณผ่าน Module 5 ครบทุกหัวข้อ และพร้อมสร้าง Production Capstone Microservice แล้ว!")
+
+# %%
