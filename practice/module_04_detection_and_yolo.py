@@ -53,8 +53,21 @@ print(f"🚀 YOLO Execution Device: {device}")
 def compute_iou(box1: list[float], box2: list[float]) -> float:
     """คำนวณ Intersection over Union (IoU) ระหว่าง 2 Bounding Boxes ในพิกัด [x1, y1, x2, y2]"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    inter_x1 = max(box1[0], box2[0])
+    inter_y1 = max(box1[1], box2[1])
+    inter_x2 = min(box1[2], box2[2])
+    inter_y2 = min(box1[3], box2[3])
 
+    inter_w = max(0.0, inter_x2 - inter_x1)
+    inter_h = max(0.0, inter_y2 - inter_y1)
+    inter_area = inter_w * inter_h
+
+    area1 = (box1[2] - box1[0]) * (box1[3] - box1[1])
+    area2 = (box2[2] - box2[0]) * (box2[3] - box2[1])
+
+    union_area=  area1 + area2 - inter_area
+
+    return inter_area / union_area if not (union_area <= 0) else 0.0 
 
 # --- ทดสอบโจทย์ข้อที่ 1 ---
 # เคสที่ 1: กล่องซ้อนทับกันพอดีเป๊ะ (IoU ต้องเท่ากับ 1.0)
@@ -104,7 +117,21 @@ def nms_from_scratch(
         keep: รายการดัชนี (indices) ของกล่องที่ได้รับเลือก
     """
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    order = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)
+    keep = []
+
+    while order:
+        best_idx = order.pop(0)
+        keep.append(best_idx)
+
+        remaining = []
+        for idx in order:
+            if compute_iou(boxes[best_idx], boxes[idx]) <= iou_threshold:
+                remaining.append(idx)
+
+        order = remaining
+
+    return keep
 
 
 # --- ทดสอบโจทย์ข้อที่ 2 ---
@@ -149,7 +176,26 @@ print("✅ ข้อที่ 2 ผ่าน! (สร้างอัลกอร
 def detect_with_yolo(model: YOLO, img_bgr: np.ndarray, conf: float = 0.25) -> list[dict]:
     """ส่งภาพเข้าตรวจจับวัตถุด้วยโมเดล YOLOv8 บน GPU และสกัดผลลัพธ์โครงสร้างข้อมูล"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    results = model(img_bgr, conf=conf, device=device, verbose=False)
+
+    boxes = results[0].boxes
+
+    detections = []
+    for box in boxes:
+        xyxy = box.xyxy[0].cpu().numpy().tolist()
+        confidence = float(box.conf[0].cpu().numpy())
+        cls_id = int(box.cls[0].cpu().numpy())
+        class_name = model.names[cls_id]
+
+        detections.append({
+            "box": xyxy,
+            "confidence": confidence,
+            "class_id": cls_id,
+            "class_name": class_name
+        })
+
+    return detections
+
 
 
 # --- ทดสอบโจทย์ข้อที่ 3 ---
@@ -190,7 +236,16 @@ print(f"✅ ข้อที่ 3 ผ่าน! (ตรวจพบวัตถ�
 def summarize_detections(detections: list[dict]) -> dict[str, int]:
     """นับจำนวนวัตถุแยกตามประเภท (Object Counting)"""
     # TODO: เขียนโค้ดตรงนี้
-    pass
+    
+    summary = {}
+    for d in detections:
+        if summary.get(d["class_name"]):
+            summary[d["class_name"]] += 1
+        else:
+            summary[d["class_name"]] = 1
+
+    return summary
+
 
 
 # --- ทดสอบโจทย์ข้อที่ 4 ---
@@ -200,3 +255,5 @@ assert isinstance(counts, dict)
 assert sum(counts.values()) == len(detections), "ยอดรวมจำนวนวัตถุต้องเท่ากับความยาวของ detections"
 print(f"✅ ข้อที่ 4 ผ่าน! (สรุปจำนวนวัตถุในภาพสำเร็จ: {counts})")
 print("\n🎉 ยินดีด้วย! คุณผ่านการประเมิน Object Detection & YOLOv8 ใน Module 4 ครบทุกข้อแล้ว!")
+
+# %%

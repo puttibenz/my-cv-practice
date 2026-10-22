@@ -40,12 +40,13 @@
 
 ---
 
-### [ ] Module 4: Transfer Learning & Real-Time Object Detection (Ultralytics YOLO)
+### [x] Module 4: Transfer Learning & Real-Time Object Detection (Ultralytics YOLO) ✅
 * **แนวคิดหลัก:**
   - การทำ Feature Extraction & Fine-tuning โมเดลระดับโลก (`ResNet18` / `MobileNetV3`)
   - คณิตศาสตร์เบื้องหลัง Object Detection: การคำนวณ **IoU (Intersection over Union)** และ **NMS (Non-Maximum Suppression)** ด้วยตัวเอง
   - การใช้งาน **YOLOv8 / YOLOv11** ตรวจจับวัตถุพร้อมดึงพิกัด Bounding Box `(x1, y1, x2, y2)`, Confidence Score และ Class ID บนภาพตัวอย่างอัตโนมัติ
 * **ไฟล์ฝึกหัด:** [`practice/module_04_detection_and_yolo.py`](./practice/module_04_detection_and_yolo.py)
+* **สถานะ:** ผ่านการทดสอบครบ 4/4 ข้อสมบูรณ์ 100% (Pass IoU, NMS, YOLOv8 GPU Inference & Object Counter)
 
 ---
 
