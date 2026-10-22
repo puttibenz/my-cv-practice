@@ -62,10 +62,11 @@
 
 ---
 
-### [ ] Production Capstone: Smart Visual Inspector & Object Counter Microservice 🚀
+### [x] Production Capstone: Smart Visual Inspector & Object Counter Microservice 🚀 ✅
 * **แนวคิดหลัก:**
   - สร้าง REST API ด้วย **FastAPI** ที่รับไฟล์รูปภาพ (`UploadFile` / Base64 หรือ URL)
   - ประมวลผลผ่าน Pipeline: `Image Validation -> OpenCV Preprocessing -> YOLO GPU Inference -> ROI Analytics -> JSON + Annotated Image Response`
-  - เขียน **Automated Pytest Suite** ตรวจสอบทั้ง Schema และ Vision Pipeline
+  - เขียน **Automated Pytest Suite** ตรวจสอบทั้ง Schema และ Vision Pipeline (14 Tests Passed)
   - แพ็กระบบลง **Docker Container** พร้อมตั้งค่า **GitHub Actions CI/CD**
-* **โฟลเดอร์โปรเจกต์:** `vision_service/`
+* **โฟลเดอร์โปรเจกต์:** [`vision_service/`](./vision_service/)
+* **สถานะ:** ผ่านการทดสอบครบ 14/14 Tests สมบูรณ์ 100% (Pass Schemas, Pipeline, REST Endpoints, Dockerfile & GitHub Actions CI/CD)
